@@ -81,7 +81,7 @@ namespace ITOI_EXAM.Controllers
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(8), // standard
+                expires: DateTime.UtcNow.AddHours(8), 
                 signingCredentials: creds
             );
 

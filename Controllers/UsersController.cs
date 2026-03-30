@@ -114,7 +114,6 @@ namespace ITOI_EXAM.Controllers
             return NoContent();
         }
 
-        // 🔹 DELETE: api/users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {

@@ -17,7 +17,6 @@ namespace ITOI_EXAM.Controllers
             _context = context;
         }
 
-        // 🔹 GET: api/userroles
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserRolesDTO.UserRole>>> GetRoles()
         {
@@ -33,7 +32,6 @@ namespace ITOI_EXAM.Controllers
             return Ok(roles);
         }
 
-        // 🔹 GET: api/userroles/5
         [HttpGet("{id}")]
         public async Task<ActionResult<UserRolesDTO.UserRole>> GetRole(int id)
         {
@@ -53,7 +51,6 @@ namespace ITOI_EXAM.Controllers
             return Ok(role);
         }
 
-        // 🔹 POST: api/userroles
         [HttpPost]
         public async Task<IActionResult> CreateRole(UserRolesDTO.CreateUserRole dto)
         {
@@ -77,7 +74,6 @@ namespace ITOI_EXAM.Controllers
             return Ok();
         }
 
-        // 🔹 PUT: api/userroles/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRole(int id, UserRolesDTO.CreateUserRole dto)
         {
@@ -93,7 +89,6 @@ namespace ITOI_EXAM.Controllers
             return NoContent();
         }
 
-        // 🔹 DELETE: api/userroles/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRole(int id)
         {
