@@ -27,7 +27,7 @@ All other required features (Task CRUD, UI, backend structure) are functional.
 ## 🛠️ Tech Stack
 
 * .NET 10
-* Blazor (Server/WebAssembly depending on your setup)
+* Blazor
 * Entity Framework Core
 * SQLite
 
@@ -60,13 +60,15 @@ dotnet build
 dotnet run
 ```
 
-After running, open the browser at:
+---
 
-```
-https://localhost:xxxx
-```
+## 🌐 Application URLs
 
-(or the URL shown in the terminal)
+* Main Application:
+  https://localhost:7211/
+
+* API Documentation (Scalar):
+  https://localhost:7211/api-documentation
 
 ---
 
@@ -81,7 +83,7 @@ dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=
 Output will be located in:
 
 ```
-On user selection
+/bin/Release/net10.0/win-x64/publish/
 ```
 
 Run the application using:
