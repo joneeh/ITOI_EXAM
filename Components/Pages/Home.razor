@@ -1,0 +1,168 @@
+﻿@page "/"
+
+@inject HttpClient Http
+
+<PageTitle>Task Manager</PageTitle>
+
+<MudText Typo="Typo.h4">Task Manager</MudText>
+
+<MudPaper Class="pa-4 mb-4" Outlined>
+    <MudTextField @bind-Value="newTask.Title" Variant="Variant.Outlined" Label="Title" Required="true" />
+    <MudTextField @bind-Value="newTask.Description" Variant="Variant.Outlined" Label="Description" Lines="2" />
+    <MudSelect T="int?" Variant="Variant.Outlined"
+               @bind-Value="newTask.AssignedUserId"
+               Label="Assign To">
+
+        @foreach (var user in users)
+        {
+            <MudSelectItem Value="@((int?)user.UserId)">
+                @user.Fullname
+            </MudSelectItem>
+        }
+
+    </MudSelect>
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CreateTask" Class="mt-2">
+        Add Task
+    </MudButton>
+
+</MudPaper>
+
+<MudPaper Outlined Class="pa-3">
+    <MudTable Items="tasks" Dense="true" Hover="true" Elevation="0">
+        <HeaderContent>
+            <MudTh>Title</MudTh>
+            <MudTh>Description</MudTh>
+            <MudTh>Status</MudTh>
+            <MudTh>Assign To</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+
+        <RowTemplate>
+            <MudTd>@context.Title</MudTd>
+            <MudTd>@context.Description</MudTd>
+            <MudTd>
+                <MudSelect T="string"
+                           Value="@context.Status"
+                           ValueChanged="s => UpdateStatus(context.Id, s)">
+
+                    @foreach (var status in Statuses)
+                    {
+                        <MudSelectItem Value="@status">@status</MudSelectItem>
+                    }
+
+                </MudSelect>
+            </MudTd>
+            <MudTd>
+                <MudSelect T="int?"
+                           Value="@context.AssignedUserId"
+                           ValueChanged="u => AssignUser(context.Id, u)">
+
+                    @foreach (var user in users)
+                    {
+                        <MudSelectItem Value="@((int?)user.UserId)">
+                            @user.Fullname
+                        </MudSelectItem>
+                    }
+
+                </MudSelect>
+            </MudTd>
+            <MudTd>
+                <MudButton Color="Color.Error" Variant="Variant.Outlined" OnClick="@(() => DeleteTask(context.Id))">
+                    Delete
+                </MudButton>
+            </MudTd>
+        </RowTemplate>
+
+    </MudTable>
+</MudPaper>
+
+@code {
+    public class TaskModel
+    {
+        public int Id { get; set; }
+        public string? Title { get; set; }
+        public string? Description { get; set; }
+        public string? Status { get; set; }
+        public int? AssignedUserId { get; set; }
+    }
+
+    public class CreateTaskModel
+    {
+        public string? Title { get; set; }
+        public string? Description { get; set; }
+        public int? AssignedUserId { get; set; }
+    }
+
+    public class UserLookup
+    {
+        public int UserId { get; set; }
+        public string Fullname { get; set; } = string.Empty;
+    }
+    
+    private readonly string[] Statuses =
+    {
+        "Pending",
+        "In-Progress",
+        "Done"
+    };
+
+
+
+    private List<TaskModel> tasks = new();
+    private List<UserLookup> users = new();
+    private CreateTaskModel newTask = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+        await LoadTasks();
+    }
+
+    private async Task LoadUsers()
+    {
+        users = await Http.GetFromJsonAsync<List<UserLookup>>("api/users") ?? new();
+    }
+
+    private async Task LoadTasks()
+    {
+        tasks = await Http.GetFromJsonAsync<List<TaskModel>>("api/tasks") ?? new();
+    }
+
+    private async Task CreateTask()
+    {
+        if (string.IsNullOrWhiteSpace(newTask.Title))
+            return;
+
+        var response = await Http.PostAsJsonAsync("api/tasks", newTask);
+
+        if (response.IsSuccessStatusCode)
+        {
+            newTask = new();
+            await LoadTasks();
+        }
+    }
+
+    private async Task UpdateStatus(int id, string status)
+    {
+        await Http.PatchAsJsonAsync($"api/tasks/{id}/status", status);
+        await LoadTasks();
+    }
+
+    private async Task AssignUser(int id, int? userId)
+    {
+        if (userId is null)
+            return;
+
+        await Http.PatchAsJsonAsync($"api/tasks/{id}/assign-user", userId.Value);
+
+        await LoadTasks();
+    }
+
+    private async Task DeleteTask(int id)
+    {
+        await Http.DeleteAsync($"api/tasks/{id}");
+        await LoadTasks();
+    }
+}
